@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply} from 'fastify'
 import { CreateDietService } from '../services/create-diet-service'
 
 
-interface UserDataProps {
+export interface UserDataProps {
   age: string,
   name: string,
   weight: string,
@@ -12,10 +12,17 @@ interface UserDataProps {
 }
 class CreateDietController{
   async handle(request: FastifyRequest, reply: FastifyReply){
-    const {age, name, weight, height, frequency, objective} = request.body;
+    const {age, name, weight, height, frequency, objective} = request.body as UserDataProps;
     
     const createDiet = new CreateDietService();
-    const diet = await createDiet.create();
+    const diet = await createDiet.create({
+      age,
+      name,
+      weight,
+      height,
+      frequency,
+      objective
+    });
 
     reply.send(diet);
   }

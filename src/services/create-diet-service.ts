@@ -2,7 +2,15 @@ import { UserDataProps } from "../controllers/create-diet";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 class CreateDietService {
-  async create({name, gender, age, weight, height, objective, frequency}: UserDataProps) {
+  async create({
+    name,
+    gender,
+    age,
+    weight,
+    height,
+    objective,
+    frequency,
+  }: UserDataProps) {
     try {
       const gemini = new GoogleGenerativeAI(process.env.API_KEY!);
       const model = gemini.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -15,9 +23,15 @@ class CreateDietService {
       if (response.response && response.response.candidates) {
         const Text = response.response.candidates[0]?.content.parts[0]
           .text as string;
-        return { data: Text };
+
+        let jsonRefac = Text.replace(/```\w*\n/g, "")
+          .replace(/\n```/g, "")
+          .trim();
+
+        let jsonObject = JSON.parse(jsonRefac);
+        return { data: jsonObject };
       }
-    } catch(err) {
+    } catch (err) {
       console.error("Erro na API", err);
       throw new Error("Falha");
     }
